@@ -7,7 +7,11 @@ USE_SECURE=${2:-OFF}
 
 if [[$USE_SECURE != "secure" || $USE_SECURE != "SECURE"]]; then
   USE_SECURE=OFF
+  LIBMIMALLOC_A=libmimalloc.a
+else
+  LIBMIMALLOC_A=libmimalloc-secure.a
 fi
+
 
 apk add --no-cache \
   patch \
@@ -43,7 +47,7 @@ for libc_path in $(find /usr -name libc.a); do
     echo "CREATE libc.a"
     echo "ADDLIB $libc_path"
     echo "DELETE aligned_alloc.lo calloc.lo donate.lo free.lo libc_calloc.lo lite_malloc.lo malloc.lo malloc_usable_size.lo memalign.lo posix_memalign.lo realloc.lo reallocarray.lo valloc.lo"
-    echo "ADDLIB out/libmimalloc.a"
+    echo "ADDLIB out/$LIBMIMALLOC_A"
     echo "SAVE"
   } | ar -M
   mv libc.a $libc_path
