@@ -1,26 +1,28 @@
 # `rust-alpine-mimalloc`
 
-This Docker image builds upon the `alpine:latest` image, provides
-`cargo`/`rustc` and replaces the default musl malloc implementation
-with [`mimalloc`](https://github.com/microsoft/mimalloc). If you build
-Rust or C/C++ static executables in this image, the resulting
-executables will automatically link with `mimalloc` without needing
-any special build flags.
+Helper script for use in an Alpine Docker image.
+Replaces the default musl malloc implementation with [`mimalloc`](https://github.com/microsoft/mimalloc). If you build Rust or C/C++ static executables in an image using this script, the resulting executables will automatically link with `mimalloc` without needing any special build flags.
 
-Notice: we switched away from `rust:alpine` and now uses
-`cargo`/`rust` packaged by alpine. Statically linked executables will
-continue to link against `mimalloc` as intended, but you need extra
-command-line arguments to ensure they are indeed static:
+Supported & tested archs: `amd64`.
 
-```sh
-$ cargo install --target x86_64-alpine-linux-musl foo
+## Usage
+
+```docker
+RUN git clone "https://github.com/WebVOWL/rust-alpine-mimalloc"
+
+RUN /rust-alpine-mimalloc/build.sh 2.2.4
+
+# Set LD_PRELOAD to use mimalloc globally
+ENV LD_PRELOAD=/usr/lib/libmimalloc.so
 ```
 
-The `--target` flag is required. The default target is either
-`x86_64-alpine-linux-musl` or `aarch64-alpine-linux-musl`, and can
-also be extracted from `$(rustc -vV | sed -n "s|host: ||p")`.
+Replace `2.2.4` with your desired version of mimalloc.
 
-Supported & tested archs: `amd64` and `arm64/v8`.
+## Documentation
 
-For more details, see this [blog
-post](https://www.tweag.io/blog/2023-08-10-rust-static-link-with-mimalloc).
+The script patches `libc.a`.
+
+For more details, see
+
+- the original [blogpost](https://www.tweag.io/blog/2023-08-10-rust-static-link-with-mimalloc).
+- an [offline copy](documentation.html) of the original blogpost.

@@ -2,28 +2,19 @@
 
 set -eu
 
-MIMALLOC_VERSION=3.1.5
-
-cd /tmp
+MIMALLOC_VERSION=$1
 
 apk upgrade --no-cache
 
 apk add --no-cache \
-  alpine-sdk \
-  cargo \
-  clang \
   cmake \
-  curl \
-  mold \
   ninja-is-really-ninja
-
-find /usr -type f -executable -name "ld" -exec sh -c 'ln -sf /usr/bin/ld.mold {}' \;
 
 curl -f -L --retry 5 https://github.com/microsoft/mimalloc/archive/refs/tags/v$MIMALLOC_VERSION.tar.gz | tar xz
 
 cd mimalloc-$MIMALLOC_VERSION
 
-patch -p1 < /tmp/mimalloc.diff
+patch -p1 < mimalloc.diff
 
 cmake \
   -Bout \
@@ -49,8 +40,3 @@ for libc_path in $(find /usr -name libc.a); do
   } | ar -M
   mv libc.a $libc_path
 done
-
-rm -rf \
-  /tmp/build.sh \
-  /tmp/mimalloc.diff \
-  /tmp/mimalloc-$MIMALLOC_VERSION
