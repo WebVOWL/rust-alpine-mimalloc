@@ -7,16 +7,24 @@ Supported & tested archs: `amd64`.
 
 ## Usage
 
+`build.sh VERSION [SECURE]`
+
+- VERSION is your desired version of mimalloc.
+- SECURE (optional) if mimalloc should be built with full security migitations (~10% slower)
+
+### Example
+
 ```docker
 RUN git clone "https://github.com/WebVOWL/rust-alpine-mimalloc"
 
 RUN /rust-alpine-mimalloc/build.sh 2.2.4
 
+# Use this to build in secure mode
+# RUN /rust-alpine-mimalloc/build.sh 2.2.4 SECURE
+
 # Set LD_PRELOAD to use mimalloc globally
 ENV LD_PRELOAD=/usr/lib/libmimalloc.so
 ```
-
-Replace `2.2.4` with your desired version of mimalloc.
 
 ## Documentation
 
