@@ -14,6 +14,7 @@ fi
 
 
 apk add --no-cache \
+  patch \
   cmake \
   ninja-is-really-ninja
 
