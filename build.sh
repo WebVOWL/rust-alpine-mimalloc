@@ -41,7 +41,7 @@ cmake \
 
 cmake --build out --target install -- -v
 
-mv out/$LIBMIMALLOC_O mimalloc.o
+mv out/$LIBMIMALLOC_O ../mimalloc.o
 
 # for libc_path in $(find /usr -name libc.a); do
 #   {
