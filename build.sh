@@ -7,9 +7,9 @@ USE_SECURE=${2:-OFF}
 
 if [[$USE_SECURE != "secure" || $USE_SECURE != "SECURE"]]; then
   USE_SECURE=OFF
-  LIBMIMALLOC_O=mimalloc.o
+  LIBMIMALLOC_A=libmimalloc.a
 else
-  LIBMIMALLOC_O=mimalloc-secure.o
+  LIBMIMALLOC_A=libmimalloc-secure.a
 fi
 
 
@@ -21,7 +21,7 @@ curl -f -L --retry 5 https://github.com/microsoft/mimalloc/archive/refs/tags/v$M
 
 cd mimalloc-$MIMALLOC_VERSION
 
-# patch -p1 < ../mimalloc.diff
+patch -p1 < ../mimalloc.diff
 
 cmake \
   -Bout \
@@ -31,8 +31,7 @@ cmake \
   -DMI_SECURE=$USE_SECURE \
   -DMI_OPT_ARCH=ON \
   -DMI_OPT_SIMD=ON \
-  -DMI_BUILD_SHARED=OFF \
-  -DMI_BUILD_OBJECT=ON \
+  -DMI_BUILD_OBJECT=OFF \
   -DMI_BUILD_TESTS=OFF \
   -DMI_LIBC_MUSL=ON \
   -DMI_SKIP_COLLECT_ON_EXIT=ON \
@@ -41,15 +40,13 @@ cmake \
 
 cmake --build out --target install -- -v
 
-mv out/$LIBMIMALLOC_O ../mimalloc.o
-
-# for libc_path in $(find /usr -name libc.a); do
-#   {
-#     echo "CREATE libc.a"
-#     echo "ADDLIB $libc_path"
-#     echo "DELETE aligned_alloc.lo calloc.lo donate.lo free.lo libc_calloc.lo lite_malloc.lo malloc.lo malloc_usable_size.lo memalign.lo posix_memalign.lo realloc.lo reallocarray.lo valloc.lo"
-#     echo "ADDLIB out/$LIBMIMALLOC_A"
-#     echo "SAVE"
-#   } | ar -M
-#   mv libc.a $libc_path
-# done
+for libc_path in $(find /usr -name libc.a); do
+  {
+    echo "CREATE libc.a"
+    echo "ADDLIB $libc_path"
+    echo "DELETE aligned_alloc.lo calloc.lo donate.lo free.lo libc_calloc.lo lite_malloc.lo malloc.lo malloc_usable_size.lo memalign.lo posix_memalign.lo realloc.lo reallocarray.lo valloc.lo"
+    echo "ADDLIB out/$LIBMIMALLOC_A"
+    echo "SAVE"
+  } | ar -M
+  mv libc.a $libc_path
+done
