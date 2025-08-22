@@ -7,9 +7,9 @@ USE_SECURE=${2:-OFF}
 
 if [[$USE_SECURE != "secure" || $USE_SECURE != "SECURE"]]; then
   USE_SECURE=OFF
-  LIBMIMALLOC_O=libmimalloc.o
+  LIBMIMALLOC_O=mimalloc.o
 else
-  LIBMIMALLOC_O=libmimalloc-secure.o
+  LIBMIMALLOC_O=mimalloc-secure.o
 fi
 
 
@@ -41,7 +41,7 @@ cmake \
 
 cmake --build out --target install -- -v
 
-mv out/$LIBMIMALLOC_O libmimalloc.o
+mv out/$LIBMIMALLOC_O mimalloc.o
 
 # for libc_path in $(find /usr -name libc.a); do
 #   {
